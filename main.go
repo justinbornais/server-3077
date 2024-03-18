@@ -20,7 +20,7 @@ func main() {
 	}
 
 	router.GET("/users/:id", getUser)
-	router.GET("/users/", createUser)
+	router.POST("/users/", createUser)
 
 	router.Run(":1450")
 }
