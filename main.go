@@ -19,8 +19,8 @@ func main() {
 		handlers.CreateUser(c, db)
 	}
 
+	router.POST("/users", createUser)
 	router.GET("/users/:id", getUser)
-	router.POST("/users/", createUser)
 
 	router.Run(":1450")
 }
