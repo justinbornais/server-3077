@@ -21,3 +21,4 @@
 go.work
 
 database.sqlite3
+.tool-versions

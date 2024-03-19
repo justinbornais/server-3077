@@ -60,6 +60,13 @@ func InitDB() *sql.DB {
 	_, err = db.Exec(user_type_stmt)
 	PanicError(err, "Error creating user_type table")
 
+	err = insertUserType(db, 1, "customer")
+	PanicError(err, "Error adding user_type customer")
+	err = insertUserType(db, 2, "staff")
+	PanicError(err, "Error adding user_type staff")
+	err = insertUserType(db, 3, "admin")
+	PanicError(err, "Error adding user_type admin")
+
 	_, err = db.Exec(users_stmt)
 	PanicError(err, "Error creating users table")
 
@@ -73,4 +80,31 @@ func InitDB() *sql.DB {
 	PanicError(err, "Error creating bookings table")
 
 	return db
+}
+
+func insertUserType(db *sql.DB, id int, name string) error {
+	// Check if the user type already exists
+	query := "SELECT id FROM user_type WHERE id = ?"
+	var existingID int
+	err := db.QueryRow(query, id).Scan(&existingID)
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	if existingID != 0 {
+		return nil // User type already exists, do nothing.
+	}
+
+	// Insert the user type if it doesn't exist
+	stmt, err := db.Prepare("INSERT INTO user_type (id, name) VALUES (?, ?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id, name)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
