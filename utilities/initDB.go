@@ -2,6 +2,7 @@ package utilities
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -85,6 +86,8 @@ func InitDB() *sql.DB {
 	_, err = db.Exec(rooms_stmt)
 	PanicError(err, "Error creating rooms table")
 
+	insertRooms(db)
+
 	_, err = db.Exec(bookings_stmt)
 	PanicError(err, "Error creating bookings table")
 
@@ -132,5 +135,52 @@ func insertRoomType(db *sql.DB, id int, name string, beds int, beach bool, price
 	defer stmt.Close()
 
 	_, err = stmt.Exec(id, name, beds, beach, price)
+	return err
+}
+
+func insertRooms(db *sql.DB) error {
+
+	query := "SELECT id FROM rooms WHERE id = 1"
+	var existingID int
+	err := db.QueryRow(query).Scan(&existingID)
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	if existingID != 0 {
+		return nil // Rooms already exist, do nothing.
+	}
+
+	insert_query := "INSERT INTO rooms (id, number, room_type, floor, status) VALUES "
+	currentId := 1
+
+	for floor := 1; floor < 5; floor++ {
+		for i := 0; i <= 10; i++ {
+			insert_query += fmt.Sprintf("(%d,%d,1,%d,\"available\"),", currentId, i+(floor*100), floor)
+			currentId++
+		}
+
+		for i := 11; i <= 20; i++ {
+			insert_query += fmt.Sprintf("(%d,%d,2,%d,\"available\"),", currentId, i+(floor*100), floor)
+			currentId++
+		}
+
+		for i := 21; i <= 25; i++ {
+			insert_query += fmt.Sprintf("(%d,%d,3,%d,\"available\"),", currentId, i+(floor*100), floor)
+			currentId++
+		}
+
+		for i := 26; i <= 30; i++ {
+			insert_query += fmt.Sprintf("(%d,%d,4,%d,\"available\"),", currentId, i+(floor*100), floor)
+			currentId++
+		}
+	}
+
+	stmt, err := db.Prepare(insert_query[:len(insert_query)-1])
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec()
 	return err
 }
