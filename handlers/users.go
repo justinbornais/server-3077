@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +25,7 @@ func AddUser(c *fiber.Ctx, db *sql.DB) error {
 
 	user.ID, _ = result.LastInsertId()
 	return c.JSON(user)
-	return c.Redirect(fmt.Sprintf("/users/%d", user.ID), fiber.StatusFound)
+	// return c.Redirect(fmt.Sprintf("/users/%d", user.ID), fiber.StatusFound)
 }
 
 func GetUser(c *fiber.Ctx, db *sql.DB) error {
