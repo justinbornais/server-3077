@@ -7,10 +7,10 @@ type UserType struct {
 
 type User struct {
 	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	UserType int    `json:"user_type"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name     string `json:"name" form:"name"`
+	UserType int    `json:"user_type" form:"user_type"`
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
 }
 
 type RoomType struct {

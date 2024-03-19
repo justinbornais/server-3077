@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,10 +11,8 @@ import (
 
 func AddUser(c *fiber.Ctx, db *sql.DB) error {
 
-	log.Println("Adding user....", string(c.Body()))
 	var user utilities.User
 	if err := c.BodyParser(&user); err != nil {
-		log.Printf("Partially parsed contents:\t%+v\n", user)
 		log.Println(err)
 		return err
 	}
@@ -27,6 +26,7 @@ func AddUser(c *fiber.Ctx, db *sql.DB) error {
 
 	user.ID, _ = result.LastInsertId()
 	return c.JSON(user)
+	return c.Redirect(fmt.Sprintf("/users/%d", user.ID), fiber.StatusFound)
 }
 
 func GetUser(c *fiber.Ctx, db *sql.DB) error {
