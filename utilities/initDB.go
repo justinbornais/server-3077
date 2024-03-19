@@ -73,6 +73,15 @@ func InitDB() *sql.DB {
 	_, err = db.Exec(room_type_stmt)
 	PanicError(err, "Error creating room_type table")
 
+	err = insertRoomType(db, 1, "Basic", 1, false, 104.99)
+	PanicError(err, "Error adding room_type Basic")
+	err = insertRoomType(db, 2, "Basic Beachside", 1, true, 154.99)
+	PanicError(err, "Error adding room_type Basic Beachside")
+	err = insertRoomType(db, 3, "Double", 2, false, 134.99)
+	PanicError(err, "Error adding room_type Double")
+	err = insertRoomType(db, 4, "Double Beachside", 2, true, 194.99)
+	PanicError(err, "Error adding room_type Double Beachside")
+
 	_, err = db.Exec(rooms_stmt)
 	PanicError(err, "Error creating rooms table")
 
@@ -83,7 +92,7 @@ func InitDB() *sql.DB {
 }
 
 func insertUserType(db *sql.DB, id int, name string) error {
-	// Check if the user type already exists
+
 	query := "SELECT id FROM user_type WHERE id = ?"
 	var existingID int
 	err := db.QueryRow(query, id).Scan(&existingID)
@@ -94,7 +103,6 @@ func insertUserType(db *sql.DB, id int, name string) error {
 		return nil // User type already exists, do nothing.
 	}
 
-	// Insert the user type if it doesn't exist
 	stmt, err := db.Prepare("INSERT INTO user_type (id, name) VALUES (?, ?)")
 	if err != nil {
 		return err
@@ -102,9 +110,27 @@ func insertUserType(db *sql.DB, id int, name string) error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(id, name)
+	return err
+}
+
+func insertRoomType(db *sql.DB, id int, name string, beds int, beach bool, price float64) error {
+
+	query := "SELECT id FROM room_type WHERE id = ?"
+	var existingID int
+	err := db.QueryRow(query, id).Scan(&existingID)
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	if existingID != 0 {
+		return nil // Room type already exists, do nothing.
+	}
+
+	stmt, err := db.Prepare("INSERT INTO room_type (id, name, beds, beach, price) VALUES (?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
-	return nil
+	_, err = stmt.Exec(id, name, beds, beach, price)
+	return err
 }
