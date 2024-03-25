@@ -5,13 +5,22 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/template/html/v2"
 	"github.com/justinbornais/server-3077/handlers"
 	"github.com/justinbornais/server-3077/utilities"
 )
 
+var store = session.New()
+
 func main() {
 
-	app := fiber.New()
+	engine := html.New("./views", ".html")
+
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
+	app.Static("/", "./assets")
 	setupMiddleware(app)
 	db := utilities.InitDB()
 	defer db.Close()
@@ -28,6 +37,12 @@ func main() {
 	app.Get("/users/:id", getUser)
 	app.Post("/users", addUser)
 
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Render("base", fiber.Map{
+			"ContentTemplate": "home",
+		})
+	})
+
 	// Start server
 	log.Fatal(app.Listen(":1450"))
 }
@@ -43,11 +58,6 @@ func setupMiddleware(app *fiber.App) {
 		}
 		return c.Next()
 	})
-
-	// app.Use(func(c *fiber.Ctx) error {
-	// 	log.Printf("%s %s - %d", c.Method(), c.OriginalURL(), c.Response().StatusCode())
-	// 	return c.Next()
-	// })
 
 	app.Use(logger.New(logger.Config{
 		// For more options, see the Config section
