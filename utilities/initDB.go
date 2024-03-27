@@ -7,7 +7,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// This will
+// Get an instance of the SQLite database.
+func GetDB() *sql.DB {
+	db, err := sql.Open("sqlite3", "./database.sqlite3")
+	PanicError(err, "Error opening the database")
+	return db
+}
+
+// This will initialize the SQLite database.
 func InitDB() *sql.DB {
 	db, err := sql.Open("sqlite3", "./database.sqlite3")
 	PanicError(err, "Error opening the database")
@@ -23,7 +30,7 @@ func InitDB() *sql.DB {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name TEXT NOT NULL,
 			user_type INTEGER NOT NULL,
-			email TEXT NOT NULL,
+			email TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL,
 			FOREIGN KEY (user_type) REFERENCES user_type(id)
 		)`

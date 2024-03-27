@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head" .}}
+<body>
+    {{template "nav" .}}
+    <div class="container site-content mt-5">
+        <h1 class="text-center">Book a Room</h1>
+
+        <h3 class="text-center">Pick a Floor, Room Type and Date Range</h3>
+        <form action="/search-rooms" method="GET">
+            <div class="mb-3">
+                <label for="floor">Floor Number</label>
+                <select class="form-control" id="floor" name="floor" required>
+                {{range .FloorNumbers}}
+                    <option value="{{.}}">{{.}}</option>
+                {{end}}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="room_type">Room Type</label>
+                <select class="form-control" id="room_type" name="room_type" required>
+                {{range .RoomTypes}}
+                    <option value="{{.ID}}">{{.Name}} - ${{.Price}} CAD per Night</option>
+                {{end}}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="start_date">Start Date</label>
+                <input type="date" class="form-control" id="start_date" name="start_date">
+            </div>
+            <div class="mb-3">
+                <label for="end_date">End Date</label>
+                <input type="date" class="form-control" id="end_date" name="end_date">
+            </div>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+
+        {{ if .RoomNumbers }}
+            <form action="/pick-room" method="GET">
+                <div class="mb-3">
+                    <label for="room">Room Number</label>
+                    <select class="form-control" id="room" name="room" required>
+                    {{range .RoomNumbers}}
+                        <option value="{{.ID}}">{{.Number}}</option>
+                    {{end}}
+                    </select>
+                </div>
+                <button type="submit">Search</button>
+            </form>
+        {{ end }}
+    </div>
+    {{template "footer" .}}
+    {{template "js" .}}
+</body>
+</html>
